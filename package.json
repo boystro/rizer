@@ -17,9 +17,26 @@
   "keywords": [
     "image",
     "resize",
+    "resizer",
     "sharp",
     "cli",
-    "tool"
+    "tool",
+    "image-processing",
+    "image-resize",
+    "node-cli",
+    "dev-tool",
+    "assets",
+    "automation",
+    "image-optimizer",
+    "responsive-images",
+    "thumbnail",
+    "batch-resize",
+    "web-dev",
+    "developer-tool"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boystro/rizer.git"
+  }
 }
