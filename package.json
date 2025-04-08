@@ -1,0 +1,25 @@
+{
+  "name": "rizer",
+  "version": "1.0.0",
+  "description": "A CLI tool to resize images by width, height, or ratio",
+  "type": "module",
+  "bin": {
+    "rizer": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.0.0",
+    "sharp": "^0.33.1"
+  },
+  "keywords": [
+    "image",
+    "resize",
+    "sharp",
+    "cli",
+    "tool"
+  ],
+  "license": "MIT"
+}
