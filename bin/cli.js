@@ -14,6 +14,7 @@ program
   .option("-r, --ratio <values>", "Comma-separated scale ratios (0 < ratio ≤ 1)", parseCSV)
   .option("-u, --allow-upscale", "Allow upscaling images beyond original size", false)
   .option("-o, --outdir <dir>", "Output directory", ".")
+  .option("--ignore-config", "Ignore configuration file")
   .action(resize);
 
 program.on("--help", help);

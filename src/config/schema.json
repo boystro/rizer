@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Rizer Config",
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string",
+      "enum": ["width", "height", "ratio"],
+      "description": "Default resizing mode to interpret 'levels'"
+    },
+    "levels": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Array of pixel sizes (for width/height) or ratios (for ratio mode)"
+    },
+    "filenamePattern": {
+      "type": "string",
+      "description": "Output filename pattern. Supports placeholders like ${name}, ${size}, ${ext}"
+    },
+    "outputFormat": {
+      "type": "string",
+      "enum": ["jpg", "jpeg", "png", "webp", "avif"],
+      "description": "Image format for resized output"
+    },
+    "outputDirectory": {
+      "type": "string",
+      "description": "Directory path to store the resized images"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "mode": { "const": "ratio" } }
+      },
+      "then": {
+        "properties": {
+          "levels": {
+            "items": {
+              "type": "number",
+              "minimum": 0.01,
+              "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "mode": { "enum": ["width", "height"] } }
+      },
+      "then": {
+        "properties": {
+          "levels": {
+            "items": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
