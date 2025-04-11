@@ -1,3 +1,5 @@
+import chalk from "chalk";
+
 export default () => {
   console.log("");
   console.log(chalk.magenta("Examples:"));

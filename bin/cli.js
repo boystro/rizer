@@ -14,6 +14,9 @@ program
   .option("-r, --ratio <values>", "Comma-separated scale ratios (0 < ratio ≤ 1)", parseCSV)
   .option("-u, --allow-upscale", "Allow upscaling images beyond original size", false)
   .option("-o, --outdir <dir>", "Output directory", ".")
+  .option("-wc, --width-count <number>", "Auto-generate N equally spaced widths", parseInt)
+  .option("-hc, --height-count <number>", "Auto-generate N equally spaced heights", parseInt)
+  .option("-rc, --ratio-count <number>", "Auto-generate N ratios between 0 and 1", parseInt)
   .option("--ignore-config", "Ignore configuration file")
   .action(resize);
 

@@ -2,8 +2,8 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 import chalk from "chalk";
-import { loadConfig } from "../config/loader.js";
-import { confirmProceed } from "../utility/promptProceed.js";
+import loadConfig from "../config/loader.js";
+import promptProceed from "../utility/promptProceed.js";
 
 export default async (file, cliOptions) => {
   if (!fs.existsSync(file)) {
@@ -20,23 +20,10 @@ export default async (file, cliOptions) => {
     outputFormat: cliOptions.outputFormat || config.outputFormat || null,
     outputDirectory: cliOptions.outputDirectory || config.outputDirectory || "./resized",
     allowUpscale: cliOptions.allowUpscale ?? config.allowUpscale ?? false,
+    widthCount: cliOptions.widthCount,
+    heightCount: cliOptions.heightCount,
+    ratioCount: cliOptions.ratioCount,
   };
-
-  if (options.width && options.width.some((w) => isNaN(w) || w < 1 || !Number.isInteger(Number(w)))) {
-    const proceed = await confirmProceed("⚠ Some values in --width look like ratios. Continue anyway?");
-    if (!proceed) {
-      console.log(chalk.gray("Operation cancelled by user."));
-      process.exit(0);
-    }
-  }
-
-  if (options.height && options.height.some((h) => isNaN(h) || h < 1 || !Number.isInteger(Number(h)))) {
-    const proceed = await confirmProceed("⚠ Some values in --height look like ratios. Continue anyway?");
-    if (!proceed) {
-      console.log(chalk.gray("Operation cancelled by user."));
-      process.exit(0);
-    }
-  }
 
   const image = sharp(file);
   const meta = await image.metadata();
@@ -44,12 +31,39 @@ export default async (file, cliOptions) => {
   const name = path.basename(file, path.extname(file));
   const outDir = options.outputDirectory;
 
+  // Validate CLI ratios
+  if (cliOptions.width && cliOptions.width.some((w) => isNaN(w) || w < 1 || !Number.isInteger(Number(w)))) {
+    const proceed = await promptProceed("⚠ Some values in --width look like ratios. Continue anyway?");
+    if (!proceed) process.exit(0);
+  }
+  if (cliOptions.height && cliOptions.height.some((h) => isNaN(h) || h < 1 || !Number.isInteger(Number(h)))) {
+    const proceed = await promptProceed("⚠ Some values in --height look like ratios. Continue anyway?");
+    if (!proceed) process.exit(0);
+  }
+
+  // Compute levels based on count
+  if (!options.levels) {
+    const count = options.widthCount || options.heightCount || options.ratioCount || 3;
+    const step = (val) => Math.floor(val / (count + 1));
+
+    if (options.mode === "width") {
+      const s = step(meta.width);
+      options.levels = Array.from({ length: count }, (_, i) => s * (i + 1));
+    } else if (options.mode === "height") {
+      const s = step(meta.height);
+      options.levels = Array.from({ length: count }, (_, i) => s * (i + 1));
+    } else {
+      const step = 1 / (count + 1);
+      options.levels = Array.from({ length: count }, (_, i) => Number(((i + 1) * step).toFixed(2)));
+    }
+  }
+
   let targets = [];
 
   if (options.mode === "width") {
     targets = options.levels.map((w) => {
       const width = parseInt(w);
-      if (!options.allowUpscale && width > meta.width) {
+      if (!options.allowUpscale && width >= meta.width) {
         console.log(chalk.gray(`✖ Skipping width ${width}px (original: ${meta.width}px)`));
         return null;
       }
@@ -58,7 +72,7 @@ export default async (file, cliOptions) => {
   } else if (options.mode === "height") {
     targets = options.levels.map((h) => {
       const height = parseInt(h);
-      if (!options.allowUpscale && height > meta.height) {
+      if (!options.allowUpscale && height >= meta.height) {
         console.log(chalk.gray(`✖ Skipping height ${height}px (original: ${meta.height}px)`));
         return null;
       }
@@ -67,7 +81,7 @@ export default async (file, cliOptions) => {
   } else {
     targets = options.levels.map((r) => {
       const ratio = parseFloat(r);
-      if (ratio <= 0 || ratio > 1) {
+      if (ratio <= 0 || ratio >= 1) {
         console.log(chalk.red(`✖ Invalid ratio:`), chalk.yellow(ratio));
         return null;
       }

@@ -1,8 +1,9 @@
 import { cosmiconfig } from "cosmiconfig";
 import Ajv from "ajv";
-import schema from "./schema.json" assert { type: "json" };
+import fs from "fs";
 import chalk from "chalk";
 
+const schema = JSON.parse(fs.readFileSync(new URL("./schema.json", import.meta.url), "utf-8"));
 const explorer = cosmiconfig("rizer");
 const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
 const validate = ajv.compile(schema);
