@@ -6,13 +6,17 @@ import loadConfig from "../config/loader.js";
 import promptProceed from "../utility/promptProceed.js";
 
 export default async (file, cliOptions) => {
+  // Check if the file exists
   if (!fs.existsSync(file)) {
     console.error(chalk.red("❌ File not found:"), chalk.yellow(file));
     process.exit(1);
   }
 
+  // Load Configuration from file
   const config = await loadConfig(cliOptions.ignoreConfig);
 
+  // Load CLI / File Configs
+  // If the CLI options are not provided, use the config file options else defaults
   const options = {
     mode: cliOptions.mode || config.mode || "ratio",
     levels: cliOptions.levels || config.levels || [0.25, 0.5, 0.75],
@@ -25,10 +29,13 @@ export default async (file, cliOptions) => {
     ratioCount: cliOptions.ratioCount,
   };
 
+  // Load image
   const image = sharp(file);
   const meta = await image.metadata();
   const ext = options.outputFormat ? `.${options.outputFormat}` : path.extname(file);
   const name = path.basename(file, path.extname(file));
+
+  // Output Directory
   const outDir = options.outputDirectory;
 
   // Validate CLI ratios

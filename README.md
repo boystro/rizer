@@ -2,6 +2,18 @@
 
 **rizer** is a lightweight CLI tool to resize images by **width**, **height**, or **ratio**, powered by [sharp](https://www.npmjs.com/package/sharp).
 
+## Update Notes
+
+Division generation. Creates breakpoints based on width, height or ratio and no. of images to generate.
+
+```sh
+rizer picture.jpg -wc 4
+# picture.jpg is 1920
+# Generates 384, 768, 1152, 1536 width
+```
+
+## Content
+
 ## 📦 Installation
 
 ### 1. As a Dev Dependency (local use in projects)
